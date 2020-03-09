@@ -1,0 +1,23 @@
+version: '2.1'
+
+services:
+  new_tv_shows:
+    image: newtvshows
+    container_name: NewTvShowsScript
+    restart: always
+    build: .
+    volumes:
+      - ./out:/out:z
+    environment:
+      - DB_HOST=192.168.0.2
+      - DB_PORT=3307
+      - DB_NAME=MyVideos116
+      - DB_USER=openelec
+      - DB_PASSWORD=openelec
+      - INTERVAL_MINUTEN=60
+      - MAX_ITEMS=200
+      - RSS_URL=https://ddl-warez.to/rss/serien.xml
+      - TZ=Europe/Zurich
+      - FLASK_DEBUG=True
+    ports: 
+        - 28080:5000
