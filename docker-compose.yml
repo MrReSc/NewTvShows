@@ -12,11 +12,11 @@ services:
       - DB_HOST=192.168.0.2
       - DB_PORT=3307
       - DB_NAME=MyVideos116
-      - DB_USER=openelec
-      - DB_PASSWORD=openelec
+      - DB_USER=****
+      - DB_PASSWORD=****
       - INTERVAL_MINUTEN=60
       - MAX_ITEMS=200
-      - RSS_URL=https://ddl-warez.to/rss/serien.xml
+      - RSS_URL=****
       - TZ=Europe/Zurich
       - FLASK_DEBUG=True
     ports: 
