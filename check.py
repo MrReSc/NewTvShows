@@ -73,10 +73,12 @@ class ExternalURLCol(Col):
     def td_format(self, content):
         return element('a', attrs=dict(href=content, target="_blank"), content="Link öffnen") 
 
-class ItemTableFilter(Table):
+class ItemTableRSS(Table):
     Titel = Col('Titel')
     Link = ExternalURLCol('Link')
     Datum = Col('Datum')
+    Staffel = Col('Staffel in DB')
+    Episode = Col('Episode in DB')
 
 def check_job():  
     print("Prüfung wird ausgeführt.")
@@ -217,17 +219,51 @@ def all():
 def serien():
     return send_from_directory('./out', "serien.xml")
 
-@app.route("/rss")
-def rss():
+def getRSStableData():
     # Eigener RSS feed abrufen
     f = feedparser.parse(feedUrl)
     daten = []
 
+    # aktuell vorhanden abrufen
+    mydb = mysql.connector.connect(** config)
+    mycursor = mydb.cursor(dictionary=True)
+    mycursor.execute(sqlquery)
+    shows = mycursor.fetchall()
+
+    for show in shows:
+        s = show["Name"]
+        s = s.replace(":", "")
+        s = s.replace(".", "")
+        s = s.replace("-", " ")
+        s = s.replace("   ", "  ")
+        s = s.replace("  ", " ")
+        s = s.replace("'", "")
+        s = s.replace("ä", "ae")
+        s = s.replace("ü", "ue")
+        s = s.replace("ö", "oe")
+        s = s.replace("F***ing", "Fucking")
+        s = re.sub(r'\(.*\)', '', s)    #löscht aller in Klammer (***)
+        s = s.lower()
+        show["Name"] = s
+
     for item in f["items"]:
-        element = dict(Titel=item["title"], Link=item["link"], Datum=item["published"])
+        for show in shows:
+            rssName = str(item["title"]).replace(".", " ").lower()
+            name = str(show["Name"])
+            if name in rssName:
+                element = dict(Titel=item["title"], Link=item["link"], Datum=item["published"], Staffel=show["Staffel"], Episode=show["Episode"])
+                break
+            else:
+                element = dict(Titel=item["title"], Link=item["link"], Datum=item["published"], Staffel="-", Episode="-")
         daten.append(element)
 
-    tabelle = ItemTableFilter(daten, border=True)
+    mycursor.close()
+    return daten
+
+@app.route("/rss")
+def rss():
+    daten = getRSStableData()
+    tabelle = ItemTableRSS(daten, border=True)
     return render_template("table.html", table=tabelle, header="Eigener RSS Feed")
 
 @app.route("/rss/update")
@@ -245,17 +281,18 @@ def filterForm():
 
 @app.route("/filter/<name>")
 def filter(name):
-    # Eigener RSS feed abrufen
-    f = feedparser.parse(feedUrl)
     daten = []
+    f = getRSStableData()
 
-    for item in f["items"]:
-        if name.lower() in item["title"].lower():
-            element = dict(Titel=item["title"], Link=item["link"], Datum=item["published"])
+    for item in f:
+        if name.lower() in item["Titel"].lower():
+            element = dict(Titel=item["Titel"], Link=item["Link"], Datum=item["Datum"], Staffel=item["Staffel"], Episode=item["Episode"])
             daten.append(element)
 
-    tabelle = ItemTableFilter(daten, border=True)
+    tabelle = ItemTableRSS(daten, border=True)
     return render_template("table.html", table=tabelle, header="Eigener RSS Feed gefiltert nach '" + name + "'")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=flask_debug)
+
+    
