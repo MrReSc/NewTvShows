@@ -41,19 +41,34 @@ config = {
 }
 
 # SQL queries
-sqlquery = "SELECT 	e.idShow, " \
-		            "t.c00 AS 'Name', " \
-		            "MAX(CAST(e.c12 AS int)) AS 'Staffel', " \
-                    "MAX(CAST(e.c13 AS int)) AS 'Episode' " \
-            "FROM episode e " \
-            "INNER JOIN tvshow t ON e.idShow=t.idShow " \
-            "GROUP BY e.idShow " \
-            "ORDER BY t.c00"
+#sqlquery = "SELECT 	e.idShow, " \
+#		            "t.c00 AS 'Name', " \
+#		            "MAX(CAST(e.c12 AS int)) AS 'Staffel', " \
+#                    "MAX(CAST(e.c13 AS int)) AS 'Episode' " \
+#            "FROM episode e " \
+#            "INNER JOIN tvshow t ON e.idShow=t.idShow " \
+#            "GROUP BY e.idShow " \
+#            "ORDER BY t.c00"
 
-sqlqueryAll =   "SELECT 	idShow, c00 AS 'Name'" \
-                "FROM tvshow " \
-                "WHERE c00 IS NOT NULL " \
-                "ORDER BY c00"
+sqlquery = ("SELECT * "
+            "FROM ("
+                "SELECT 	e.idShow, "
+    		                "t.c00 AS 'Name', "
+    		                "CAST(e.c12 AS int) AS 'Staffel', "
+    		                "CAST(e.c13 AS int) AS 'Episode', "
+                "rank() over ( "
+                "PARTITION BY t.c00 "
+     		    "ORDER BY CAST(e.c12 AS int) DESC, CAST(e.c13 AS int) DESC "
+                ") rn "
+                "FROM episode e "
+                "INNER JOIN tvshow t ON e.idShow=t.idShow "
+                ") v "
+            "WHERE rn = 1")
+
+sqlqueryAll =  ("SELECT idShow, c00 AS 'Name' "
+                "FROM tvshow "
+                "WHERE c00 IS NOT NULL "
+                "ORDER BY c00")
 
 sqlqueryName = "SELECT c00 FROM tvshow WHERE c00 IS NOT NULL"
 
