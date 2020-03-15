@@ -90,10 +90,10 @@ class ExternalURLCol(Col):
 
 class ItemTableRSS(Table):
     Titel = Col('Titel')
+    Episode = Col('Episode')
     Link = ExternalURLCol('Link')
     Datum = Col('Datum')
-    Staffel = Col('Staffel in DB')
-    Episode = Col('Episode in DB')
+    Vorhanden = Col('Letzte vorhandene Episode')
 
 def check_job():  
     print("Prüfung wird ausgeführt.")
@@ -104,21 +104,8 @@ def check_job():
     myresult = [item[0] for item in mycursor.fetchall()]
     shows = []
     for show in myresult:
-        s= str(show)
-        s = s.replace(":", "")
-        s = s.replace(".", "")
-        s = s.replace("-", " ")
-        s = s.replace("   ", "  ")
-        s = s.replace("  ", " ")
-        s = s.replace("'", "")
-        s = s.replace("ä", "ae")
-        s = s.replace("ü", "ue")
-        s = s.replace("ö", "oe")
-        s = s.replace("F***ing", "Fucking")
-
-        s = re.sub(r'\(.*\)', '', s)
-        s = s.lower()
-
+        s = str(show)
+        s = cleanName(s)
         if s not in shows:
             shows.append(s)
 
@@ -185,7 +172,52 @@ def check_job():
             tree = ET.ElementTree(channel)
             tree.write(feedUrl, pretty_print=True, xml_declaration=True)
 
-    mycursor.close()      
+    mycursor.close()    
+
+def cleanName(name):
+    name = name.replace(":", "").replace(".", "").replace("'", "")
+    name = name.replace("-", " ")
+    name = name.replace("ä", "ae").replace("ü", "ue").replace("ö", "oe")
+    name = name.replace("F***ing", "Fucking")
+    name = re.sub(r' +', ' ', name)       # löscht unnötigen leerzeichen
+    name = re.sub(r'\(.*\)', '', name)    # löscht alles in Klammer (***)
+    name = name.lower()
+    return name
+
+def getRSStableData():
+    # Eigener RSS feed abrufen
+    f = feedparser.parse(feedUrl)
+    daten = []
+
+    # aktuell vorhanden abrufen
+    mydb = mysql.connector.connect(** config)
+    mycursor = mydb.cursor(dictionary=True)
+    mycursor.execute(sqlquery)
+    shows = mycursor.fetchall()
+
+    for show in shows:
+        show["Name"] = cleanName(show["Name"])
+
+    for item in f["items"]:
+        for show in shows:
+            rssName = str(item["title"]).replace(".", " ").lower()
+            name = str(show["Name"])
+            vorhanden = "S" + str(show["Staffel"]).zfill(2) + "E" + str(show["Episode"]).zfill(2) # mit vornull wenn nicht vorhanden
+            match = re.search(r"(?:s)(\d{2})(?:.|)(?:e)(\d{2})", item["title"], re.I)             # regex um S01E01 oder S01.E01 zu finden
+            if match:
+                episode = match.group().replace(".", "")
+            else:
+                episode = "-"
+
+            if name in rssName:
+                element = dict(Titel=item["title"], Episode=episode, Link=item["link"], Datum=item["published"], Vorhanden=vorhanden)
+                break
+            else:
+                element = dict(Titel=item["title"], Episode=episode, Link=item["link"], Datum=item["published"], Vorhanden="-")
+        daten.append(element)
+
+    mycursor.close()
+    return daten
 
 
 check_job()
@@ -234,47 +266,6 @@ def all():
 def serien():
     return send_from_directory('./out', "serien.xml")
 
-def getRSStableData():
-    # Eigener RSS feed abrufen
-    f = feedparser.parse(feedUrl)
-    daten = []
-
-    # aktuell vorhanden abrufen
-    mydb = mysql.connector.connect(** config)
-    mycursor = mydb.cursor(dictionary=True)
-    mycursor.execute(sqlquery)
-    shows = mycursor.fetchall()
-
-    for show in shows:
-        s = show["Name"]
-        s = s.replace(":", "")
-        s = s.replace(".", "")
-        s = s.replace("-", " ")
-        s = s.replace("   ", "  ")
-        s = s.replace("  ", " ")
-        s = s.replace("'", "")
-        s = s.replace("ä", "ae")
-        s = s.replace("ü", "ue")
-        s = s.replace("ö", "oe")
-        s = s.replace("F***ing", "Fucking")
-        s = re.sub(r'\(.*\)', '', s)    #löscht aller in Klammer (***)
-        s = s.lower()
-        show["Name"] = s
-
-    for item in f["items"]:
-        for show in shows:
-            rssName = str(item["title"]).replace(".", " ").lower()
-            name = str(show["Name"])
-            if name in rssName:
-                element = dict(Titel=item["title"], Link=item["link"], Datum=item["published"], Staffel=show["Staffel"], Episode=show["Episode"])
-                break
-            else:
-                element = dict(Titel=item["title"], Link=item["link"], Datum=item["published"], Staffel="-", Episode="-")
-        daten.append(element)
-
-    mycursor.close()
-    return daten
-
 @app.route("/rss")
 def rss():
     daten = getRSStableData()
@@ -301,8 +292,7 @@ def filter(name):
 
     for item in f:
         if name.lower() in item["Titel"].lower():
-            element = dict(Titel=item["Titel"], Link=item["Link"], Datum=item["Datum"], Staffel=item["Staffel"], Episode=item["Episode"])
-            daten.append(element)
+            daten.append(item)
 
     tabelle = ItemTableRSS(daten, border=True)
     return render_template("table.html", table=tabelle, header="Eigener RSS Feed gefiltert nach '" + name + "'")
