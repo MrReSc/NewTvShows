@@ -1,11 +1,23 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
+  background-color: #444;
+  color: #e4e4e4;
+  margin: 25px 75px;
+}
+
+a {
+  color: #e39777;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+input {
+  height: 35px;
+  box-sizing: border-box;
 }
 
 /* Tabelle */
@@ -15,20 +27,20 @@ table {
   }
   
 td, th {
-  border: 1px solid #ddd;
+  border: 1px solid #777;
   padding: 4px;
 }
   
-tr:nth-child(even){background-color: #f2f2f2;}
+tr:nth-child(even){background-color: #555;}
 
-tr:hover {background-color: #ddd;}
+tr:hover {background-color: #666;}
 
 th {
   padding-top: 4px;
   padding-bottom: 5px;
   text-align: left;
   background-color: #4682B4;
-  color: white;
+  color: #e4e4e4;
 }
 
 /* Navbar */
@@ -46,7 +58,7 @@ li {
 
 li a {
   display: block;
-  color: white;
+  color: #e4e4e4;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;

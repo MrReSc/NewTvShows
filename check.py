@@ -247,7 +247,7 @@ def current():
     mycursor.execute(sqlquery)
     tabelle = ItemTable(mycursor.fetchall(), border=True)
     mycursor.close()
-    return render_template("table.html", table=tabelle, header="Aktuelle auf Server vorhanden")
+    return render_template("table.html", table=tabelle, header="Aktuelle auf Server vorhande Shows")
 
 @app.route("/all")
 def all():
@@ -256,7 +256,7 @@ def all():
     mycursor.execute(sqlqueryAll)
     tabelle = ItemTableAll(mycursor.fetchall(), border=True)
     mycursor.close() 
-    return render_template("table.html", table=tabelle, header="Alle in Datenbank vorhanden")
+    return render_template("table.html", table=tabelle, header="Alle in Datenbank vorhanden Shows")
 
 @app.route("/serien.xml")
 def serien():
