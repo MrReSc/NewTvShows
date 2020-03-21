@@ -51,7 +51,7 @@ tr {
   
 /* tr:nth-child(even){background-color: #555;} */
 
-tr:hover {background-color: #666;}
+tr:hover {background-color: #111;}
 
 th {
   padding-top: 4px;
