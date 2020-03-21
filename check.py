@@ -40,16 +40,6 @@ config = {
   "passwd" : os.environ["DB_PASSWORD"]
 }
 
-# SQL queries
-#sqlquery = "SELECT 	e.idShow, " \
-#		            "t.c00 AS 'Name', " \
-#		            "MAX(CAST(e.c12 AS int)) AS 'Staffel', " \
-#                    "MAX(CAST(e.c13 AS int)) AS 'Episode' " \
-#            "FROM episode e " \
-#            "INNER JOIN tvshow t ON e.idShow=t.idShow " \
-#            "GROUP BY e.idShow " \
-#            "ORDER BY t.c00"
-
 sqlquery = ("SELECT * "
             "FROM ("
                 "SELECT 	e.idShow, "
@@ -125,7 +115,7 @@ def check_job():
     for i in feed["items"]:
         t = str(i["title"]).replace(".", " ").lower()
 
-        # Überprüfen ob Titel schon in einem Feed vorhanden ist
+        # Überprüfen ob Titel aus externem RSS Feed schon im eigenen Feed vorhanden ist
         check = True
         for item_e in feed_e["items"]:
             t_e = str(item_e["title"]).replace(".", " ").lower()
@@ -133,11 +123,12 @@ def check_job():
                 check = False
                 break
 
-        if check:    
+        # Titel ist nicht im eigenen Feed vorhanden                
+        if check:
+            # Überprüfen ob eine Show aus der DB im externen Feed vorhanden ist    
             for show in shows:
                 if show in t:
-
-                    # SubElement erstellen
+                    # Wenn Show vorhadnen ist dann SubElement erstellen
                     item = ET.SubElement(channel, "item")
                     title = ET.SubElement(item, "title")
                     link = ET.SubElement(item, "link")
@@ -179,25 +170,31 @@ def cleanName(name):
     name = name.replace("-", " ")
     name = name.replace("ä", "ae").replace("ü", "ue").replace("ö", "oe")
     name = name.replace("F***ing", "Fucking")
-    name = re.sub(r' +', ' ', name)       # löscht unnötigen leerzeichen
-    name = re.sub(r'\(.*\)', '', name)    # löscht alles in Klammer (***)
+    name = re.sub(r' +', ' ', name)       # löscht unnötige Leerzeichen
+    name = re.sub(r'\(.*\)', '', name)    # löscht alles in Klammern (Blafoo2017)
     name = name.lower()
     return name
 
 def getRSStableData():
+    # Diese Methode ruft alle Elemente aus dem eigenen RSS Feed ab und 
+    # ergänz sie mit Infos aus der Datenbank 
+
     # Eigener RSS feed abrufen
     f = feedparser.parse(feedUrl)
     daten = []
 
-    # aktuell vorhanden abrufen
+    # aktuell vorhande Shows abrufen
     mydb = mysql.connector.connect(** config)
     mycursor = mydb.cursor(dictionary=True)
     mycursor.execute(sqlquery)
     shows = mycursor.fetchall()
 
+    # Titel aus eigenem RSS Feed bereinigen
     for show in shows:
         show["Name"] = cleanName(show["Name"])
 
+    # Jedem Element im eigenen Feed wird, falls vorhanden, die aktuelle Episode aus der DB hinzugefügt
+    # Die Staffel/Episode wird aus dem Titel des Feed Elements geparsed  
     for item in f["items"]:
         for show in shows:
             rssName = str(item["title"]).replace(".", " ").lower()
@@ -219,9 +216,10 @@ def getRSStableData():
     mycursor.close()
     return daten
 
-
+# Methode beim starten einmalig aufrufen
 check_job()
 
+# Background Job starten
 scheduler = BackgroundScheduler()
 scheduler.add_job(check_job, 'interval', minutes=minuteInt)
 scheduler.start()
