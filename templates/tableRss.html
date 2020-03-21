@@ -6,16 +6,16 @@
         {{nav.top.render()}}
 
         <div class='header'>
-            <h1> {{ header }} </h1>
+            <h2> {{ header }} </h2>
 
             <form action="/rss/update">
-                <input type = "submit" value = "Update RSS Feed" />
+                <input type = "submit" class = "button" value = "Update RSS Feed" />
             </form>
         </div>
 
         <form action = "/rss" method = "post" >
-            <input type = "text" name = "nm" placeholder="Suchbegriff..." />
-            <input type = "submit" value = "Suchen" />
+            <input type = "text" class = "searchbox" name = "nm" placeholder="Suchbegriff..." />
+            <input type = "submit" class = "button" value = "Suchen" />
         </form>
 
         {{ table }}

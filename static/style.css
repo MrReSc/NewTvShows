@@ -1,5 +1,6 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
   background-color: #444;
   color: #e4e4e4;
   margin: 25px 75px;
@@ -16,22 +17,39 @@ a {
 }
 
 input {
-  height: 35px;
+  height: 40px;
   box-sizing: border-box;
+  background-color: #333;
+  color: #e4e4e4;
+  border: none;
+}
+
+.searchbox {
+  padding-left: 10px;
+}
+
+.button:hover {
+  background-color: #111;
 }
 
 /* Tabelle */
 table {
     border-collapse: collapse;
     width: 100%;
+    border: none;
   }
   
 td, th {
-  border: 1px solid #777;
-  padding: 4px;
+  /* border: 1px solid #777; */
+  padding: 6px;
+  border: none;
+}
+
+tr {
+  background-color: #333;
 }
   
-tr:nth-child(even){background-color: #555;}
+/* tr:nth-child(even){background-color: #555;} */
 
 tr:hover {background-color: #666;}
 
@@ -41,6 +59,11 @@ th {
   text-align: left;
   background-color: #4682B4;
   color: #e4e4e4;
+}
+
+thead {
+  height: 30px;
+  font-size: larger;
 }
 
 /* Navbar */

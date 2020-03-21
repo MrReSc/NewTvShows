@@ -231,14 +231,14 @@ app = Flask(__name__)
 nav = Nav(app)
 nav.register_element('top', Navbar(
     View('Home', 'home'),
+    View('RSS Feed', 'rss'),
     View('Aktuelle Episoden', 'current'),
     View('Alle Shows', 'all'),
-    View('RSS Feed', 'rss'),
 ))
 
 @app.route("/")
 def home():
-    return redirect('/current')
+    return redirect('/rss')
 
 @app.route("/current")
 def current():
@@ -247,7 +247,7 @@ def current():
     mycursor.execute(sqlquery)
     tabelle = ItemTable(mycursor.fetchall(), border=True)
     mycursor.close()
-    return render_template("table.html", table=tabelle, header="Aktuelle auf Server vorhande Shows")
+    return render_template("table.html", table=tabelle, header="Aktuell auf Server vorhandene Shows")
 
 @app.route("/all")
 def all():
