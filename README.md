@@ -24,7 +24,6 @@ Das Skript `check.py` ruft Daten aus einer Datenbank ab und vergleicht diese mit
 | /serien.xml        | RSS Feed                                                    |
 | /rss               | RSS Feed als Tabelle                                        |
 | /rss/update        | RSS Feed aktualisieren. Öffnet `/rss` nach update.          |
-| /filterForm        | RSS Feed Titel nach "term" filtern                          |
 | /filter/"term"     | RSS Feed Titel nach "term" gefiltert                        |
 
 ## podman (Fedora)

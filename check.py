@@ -231,11 +231,9 @@ app = Flask(__name__)
 nav = Nav(app)
 nav.register_element('top', Navbar(
     View('Home', 'home'),
-    View('Aktuell vorhanden', 'current'),
-    View('Alle in DB', 'all'),
+    View('Aktuelle Episoden', 'current'),
+    View('Alle Shows', 'all'),
     View('RSS Feed', 'rss'),
-    View('RSS Feed filtern', 'filterForm'),
-    View('RSS Feed updaten', 'update')
 ))
 
 @app.route("/")
@@ -264,24 +262,20 @@ def all():
 def serien():
     return send_from_directory('./out', "serien.xml")
 
-@app.route("/rss")
+@app.route("/rss", methods = ['POST', 'GET'])
 def rss():
-    daten = getRSStableData()
-    tabelle = ItemTableRSS(daten, border=True)
-    return render_template("table.html", table=tabelle, header="Eigener RSS Feed")
+    if request.method == 'POST':
+        name = request.form['nm']
+        return redirect(url_for('filter',name = name))
+    else:
+        daten = getRSStableData()
+        tabelle = ItemTableRSS(daten, border=True)
+        return render_template("tableRss.html", table=tabelle, header="Eigener RSS Feed")
 
 @app.route("/rss/update")
 def update():
     check_job()
     return redirect('/rss')
-
-@app.route("/filterForm", methods = ['POST', 'GET'])
-def filterForm():
-    if request.method == 'POST':
-        name = request.form['nm']
-        return redirect(url_for('filter',name = name))
-    else:
-        return render_template("filter.html", header="Eigener RSS Feed filtern")
 
 @app.route("/filter/<name>")
 def filter(name):
@@ -293,7 +287,7 @@ def filter(name):
             daten.append(item)
 
     tabelle = ItemTableRSS(daten, border=True)
-    return render_template("table.html", table=tabelle, header="Eigener RSS Feed gefiltert nach '" + name + "'")
+    return render_template("table.html", table=tabelle, header="Suchbegriff: '" + name + "'")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=flask_debug)

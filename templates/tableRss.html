@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <link rel="stylesheet" href='/static/style.css'>
+    </head>
+    <body>
+        {{nav.top.render()}}
+
+        <div class='header'>
+            <h1> {{ header }} </h1>
+
+            <form action="/rss/update">
+                <input type = "submit" value = "Update RSS Feed" />
+            </form>
+        </div>
+
+        <form action = "/rss" method = "post" >
+            <input type = "text" name = "nm" placeholder="Suchbegriff..." />
+            <input type = "submit" value = "Suchen" />
+        </form>
+
+        {{ table }}
+    </body>
+</html>
