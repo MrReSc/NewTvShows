@@ -9,6 +9,7 @@ from flask_table import Table, Col
 from flask_table.html import element
 from flask_nav import Nav
 from flask_nav.elements import *
+from datetime import datetime
 
 print("Skript gestartet.")
 
@@ -198,19 +199,31 @@ def getRSStableData():
     for item in f["items"]:
         for show in shows:
             rssName = str(item["title"]).replace(".", " ").lower()
-            name = str(show["Name"])
+            name = show["Name"]
+
+            # Vorhandene Staffel/Epdisode auf Server
             vorhanden = "S" + str(show["Staffel"]).zfill(2) + "E" + str(show["Episode"]).zfill(2) # mit vornull wenn nicht vorhanden
+
+            # Vorhandene Staffel/Epdisode aus Titel parsen
             match = re.search(r"(?:s)(\d{2})(?:.|)(?:e)(\d{2})", item["title"], re.I)             # regex um S01E01 oder S01.E01 zu finden
             if match:
                 episode = match.group().replace(".", "")
             else:
                 episode = "-"
 
+            # Veröffentlichungsdatum formatieren
+            try: 
+                datetime_str = item["published"]
+                datetime_object = datetime.strptime(datetime_str, "%a, %d %b %Y %H:%M:%S %z")
+                datum = datetime_object.strftime("%d.%m.%Y, %H:%M:%S")
+            except:
+                datum = item["published"]
+
             if name in rssName:
-                element = dict(Titel=item["title"], Episode=episode, Link=item["link"], Datum=item["published"], Vorhanden=vorhanden)
+                element = dict(Titel=item["title"], Episode=episode, Link=item["link"], Datum=datum, Vorhanden=vorhanden)
                 break
             else:
-                element = dict(Titel=item["title"], Episode=episode, Link=item["link"], Datum=item["published"], Vorhanden="-")
+                element = dict(Titel=item["title"], Episode=episode, Link=item["link"], Datum=datum, Vorhanden="-")
         daten.append(element)
 
     mycursor.close()
@@ -269,7 +282,7 @@ def rss():
         return redirect(url_for('filter',name = name))
     else:
         daten = getRSStableData()
-        tabelle = ItemTableRSS(daten, border=True)
+        tabelle = ItemTableRSS(daten, border=True, table_id="rssTable")
         return render_template("tableRss.html", table=tabelle, header="Eigener RSS Feed")
 
 @app.route("/rss/update")
@@ -286,7 +299,7 @@ def filter(name):
         if name.lower() in item["Titel"].lower():
             daten.append(item)
 
-    tabelle = ItemTableRSS(daten, border=True)
+    tabelle = ItemTableRSS(daten, border=True, table_id="rssTable")
     return render_template("table.html", table=tabelle, header="Suchbegriff: '" + name + "'")
 
 if __name__ == "__main__":

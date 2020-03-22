@@ -32,6 +32,12 @@ input {
   background-color: #111;
 }
 
+.episodeColored {
+  /* background-color: rgba(80, 255, 153, 0.2); */
+  color: #2bc45e;
+  /* font-weight: bolder; */
+}
+
 /* Tabelle */
 table {
     border-collapse: collapse;
