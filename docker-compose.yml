@@ -8,6 +8,7 @@ services:
     build: .
     volumes:
       - ./out:/out:z
+      - ./config:/config:z
     environment:
       - DB_HOST=192.168.0.2
       - DB_PORT=3307

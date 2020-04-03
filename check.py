@@ -32,6 +32,11 @@ flask_debug=os.environ["FLASK_DEBUG"]
 if not os.path.exists("./out/serien.xml"):
     os.system("cp ./serien.xml ./out/serien.xml")
 
+# replace.txt in config erstellen wenn nicht vorhanden
+if not os.path.exists("./config/replace.txt"):
+    os.system("mkdir ./config")
+    os.system("touch ./config/replace.txt")
+
 # DB Config
 config = {
   "host" : os.environ["DB_HOST"],
@@ -164,16 +169,25 @@ def check_job():
             tree = ET.ElementTree(channel)
             tree.write(feedUrl, pretty_print=True, xml_declaration=True)
 
-    mycursor.close()    
+    mycursor.close()
 
-def cleanName(name):
-    name = name.replace(":", "").replace(".", "").replace("'", "")
-    name = name.replace("-", " ")
-    name = name.replace("ä", "ae").replace("ü", "ue").replace("ö", "oe")
-    name = name.replace("F***ing", "Fucking")
-    name = re.sub(r' +', ' ', name)       # löscht unnötige Leerzeichen
-    name = re.sub(r'\(.*\)', '', name)    # löscht alles in Klammern (Blafoo2017)
-    name = name.lower()
+def cleanName(name):   
+    # Wenn ein File vorhanden ist und nicht leer dann werden die Begiffe ersetzt
+    d = {}
+    path = "./config/replace.txt"
+    if os.path.exists(path) and os.path.getsize(path) > 0:
+        with open(path) as f:
+            d = dict([line.split("|") for line in f])
+
+        for x, y in d.items():
+            name = name.replace(x, y)
+
+    name = re.sub(r'\(.*\)', '', name)                                      # löscht alles in Klammern (Blafoo2017)
+    name = name.replace("-", " ").replace("–", " ")                         # Bindestriche durch space ersetzten
+    name = name.replace("ä", "ae").replace("ü", "ue").replace("ö", "oe")    # äöü ersetzten
+    name = re.sub(r'[^A-Za-z0-9 ]+', '', name)                              # löscht alles was nicht Buchstabe, Space oder Zahl ist  
+    name = re.sub(r' +', ' ', name)                                         # löscht unnötige Leerzeichen
+    name = name.lower()                                                     # alles lower case
     return name
 
 def getRSStableData():
