@@ -77,7 +77,7 @@ class ItemTableAll(Table):
 
 class ExternalURLCol(Col):
     def td_format(self, content):
-        return element('a', attrs=dict(href=content, target="_blank"), content="Link öffnen") 
+        return element('a', attrs=dict(href=content, target="_blank"), content="Seite öffnen") 
 
 class ItemTableRSS(Table):
     Titel = Col('Titel')

@@ -1,28 +1,54 @@
+:root {
+  --main-bg-color: #2D2D2D;
+  --bg-color: #1E1E1E;
+  --hover-bg-color: #111111;
+  --main-color: #3465A4;
+  --mark-color: #4E9A06;
+  --link-color: #BEC030;
+  --link-hover-color: #9ac0df;
+  --link-visited-color: #778500;
+  --text-color: #e4e4e4;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: large;
-  background-color: #444;
-  color: #e4e4e4;
+  font-family: monospace;
+  font-size: medium;
+  background-color: var(--main-bg-color);
+  color: var(--text-color);
   margin: 25px 75px;
 }
 
-a {
-  color: #e39777;
+tbody tr td a,
+tbody tr td a:active {
+  color: var(--link-color);
+  text-decoration: none
+}
+
+tbody tr td a:hover {
+  color: var(--link-hover-color);
+  text-decoration: underline
+}
+
+tbody tr td a:visited {
+  color: var(--link-visited-color);
+  text-decoration: none
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
 }
 
 input {
   height: 40px;
   box-sizing: border-box;
-  background-color: #333;
-  color: #e4e4e4;
+  background-color: var(--bg-color);
+  color: var(--text-color);
   border: none;
 }
+
+input, select, textarea, button{font-family:inherit;}
 
 .searchbox {
   padding-left: 10px;
@@ -33,9 +59,7 @@ input {
 }
 
 .episodeColored {
-  /* background-color: rgba(80, 255, 153, 0.2); */
-  color: #2bc45e;
-  /* font-weight: bolder; */
+  color: var(--mark-color);
 }
 
 /* Tabelle */
@@ -46,30 +70,28 @@ table {
   }
   
 td, th {
-  /* border: 1px solid #777; */
   padding: 6px;
   border: none;
 }
 
 tr {
-  background-color: #333;
+  background-color: var(--bg-color);
 }
   
-/* tr:nth-child(even){background-color: #555;} */
-
-tr:hover {background-color: #111;}
+tr:hover {
+  background-color: var(--hover-bg-color);
+}
 
 th {
   padding-top: 4px;
   padding-bottom: 5px;
   text-align: left;
-  background-color: #4682B4;
-  color: #e4e4e4;
+  background-color: var(--main-color);
+  color: var(--text-color); 
 }
 
 thead {
   height: 30px;
-  font-size: larger;
 }
 
 /* Navbar */
@@ -78,7 +100,8 @@ ul {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333;
+  background-color: var(--bg-color);
+  font-size: inherit;
 }
 
 li {
@@ -87,16 +110,17 @@ li {
 
 li a {
   display: block;
-  color: #e4e4e4;
+  color: var(--text-color);
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
+  font-size: x-large;
 }
 
 li a:hover:not(.active) {
-  background-color: #111;
+  background-color: var(--hover-bg-color);
 }
 
 .active {
-  background-color: #4682B4;
+  background-color: var(--main-color);
 }
