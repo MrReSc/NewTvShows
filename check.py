@@ -10,23 +10,45 @@ from flask_table.html import element
 from flask_nav import Nav
 from flask_nav.elements import *
 from datetime import datetime
+import logging
+from logging.handlers import RotatingFileHandler
 
-print("Skript gestartet.")
+# Start Flask
+app = Flask(__name__)
+
+# Debug Level
+debug_level_str = os.environ["DEBUG_LEVEL"]
+debug_level = logging.INFO
+flask_debug = "False"
+log_path = "./debug.log"
+
+if debug_level_str.lower() == "debug":
+    debug_level = logging.DEBUG
+    flask_debug = "True"
+
+logging.basicConfig(
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    level=debug_level,
+    handlers=[
+        # logging.FileHandler(log_path),
+        logging.StreamHandler(),
+        RotatingFileHandler(log_path, maxBytes=100000, backupCount=0),
+    ]
+)
+
+app.logger.info("Skript gestartet.")
 
 # Interval Zeit in Minuten
 minuteInt = int(os.environ["INTERVAL_MINUTEN"])
-print("Intervall Zeit ist " + str(minuteInt) + " Minuten.")
+app.logger.info("Intervall Zeit ist " + str(minuteInt) + " Minuten.")
 
 # Maximale Anzahl Items im Feed
 maxItemsInt = int(os.environ["MAX_ITEMS"])
-print("Es werden max. " + str(maxItemsInt) + " Items im Feed behalten.")
+app.logger.info("Es werden max. " + str(maxItemsInt) + " Items im Feed behalten.")
 
 # Url für RSS Feed der Überwacht werden soll
 rssUrl = os.environ["RSS_URL"]
-print("Der Url " + rssUrl + " wird überwacht.")
-
-# Flask debug
-flask_debug=os.environ["FLASK_DEBUG"]
+app.logger.info("Der Url " + rssUrl + " wird überwacht.")
 
 # Eigener Feed in out Ordner kopieren wenn nicht vorhanden
 if not os.path.exists("./out/serien.xml"):
@@ -182,12 +204,13 @@ def cleanName(name):
         for x, y in d.items():
             name = name.replace(x, y)
 
-    name = re.sub(r'\(.*\)', '', name)                                      # löscht alles in Klammern (Blafoo2017)
-    name = name.replace("-", " ").replace("–", " ")                         # Bindestriche durch space ersetzten
+    name = re.sub(r'\(.*\)', '', name)                                      # löscht alles in Klammern und Klammern (Blafoo2017)
+    name = name.replace("-", " ").replace("–", " ")                         # Bindestriche durch Leerzeichen ersetzten
     name = name.replace("ä", "ae").replace("ü", "ue").replace("ö", "oe")    # äöü ersetzten
-    name = re.sub(r'[^A-Za-z0-9 ]+', '', name)                              # löscht alles was nicht Buchstabe, Space oder Zahl ist  
+    name = re.sub(r'[^A-Za-z0-9 ]+', '', name)                              # löscht alles was nicht Buchstabe, Leerzeichen oder Zahl ist  
     name = re.sub(r' +', ' ', name)                                         # löscht unnötige Leerzeichen
     name = name.lower()                                                     # alles lower case
+    app.logger.debug(name)
     return name
 
 def getRSStableData():
@@ -251,9 +274,6 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(check_job, 'interval', minutes=minuteInt)
 scheduler.start()
 
-# Start Flask
-app = Flask(__name__)
-
 # Navbar
 nav = Nav(app)
 nav.register_element('top', Navbar(
@@ -261,6 +281,7 @@ nav.register_element('top', Navbar(
     View('RSS Feed', 'rss'),
     View('Aktuelle Episoden', 'current'),
     View('Alle Shows', 'all'),
+    View('Log', 'log'),
 ))
 
 @app.route("/")
@@ -315,6 +336,20 @@ def filter(name):
 
     tabelle = ItemTableRSS(daten, border=True, table_id="rssTable")
     return render_template("table.html", table=tabelle, header="Suchbegriff: '" + name + "'")
+
+@app.route('/log')
+def log():
+    content = ""
+    content_list = []
+    with open(log_path, "r") as f:
+        lines = f.readlines()
+        # Log File inhalt rückwerts einlesen
+        for line in reversed(lines):
+            content_list.append(line)
+        # Liste zu String
+        content = "".join(content_list[1:])
+
+    return render_template('log.html', log=content)    
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=flask_debug)

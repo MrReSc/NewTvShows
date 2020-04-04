@@ -13,7 +13,7 @@ Das Skript `check.py` ruft Daten aus einer Datenbank ab und vergleicht diese mit
 | MAX_ITEMS         | Max. Anzahl Items im RSS Feed | 200                                 |
 | RSS_URL           | Zu überprüfender Feed         | https://***************ien.xml      |
 | TZ                | Zeitzone                      | Europe/Zurich                       |
-| FLASK_DEBUG       | Debugmode von Flask           | True                                |
+| DEBUG_LEVEL       | Debug Level                   | DEBUG / INFO                        |
 
 ## Endpoints
 | Endpoint           | Beschreibung                                                |
@@ -25,6 +25,7 @@ Das Skript `check.py` ruft Daten aus einer Datenbank ab und vergleicht diese mit
 | /rss               | RSS Feed als Tabelle                                        |
 | /rss/update        | RSS Feed aktualisieren. Öffnet `/rss` nach update.          |
 | /filter/"term"     | RSS Feed Titel nach "term" gefiltert                        |
+| /log               | Inhalt der Log Datei                                        |
 
 ## podman (Fedora)
 
