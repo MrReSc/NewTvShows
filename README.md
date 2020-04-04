@@ -13,7 +13,7 @@ Das Skript `check.py` ruft Daten aus einer Datenbank ab und vergleicht diese mit
 | MAX_ITEMS         | Max. Anzahl Items im RSS Feed | 200                                 |
 | RSS_URL           | Zu überprüfender Feed         | https://***************ien.xml      |
 | TZ                | Zeitzone                      | Europe/Zurich                       |
-| LOG_LEVEL         | Logging Level                 | DEBUG / INFO                        |
+| LOG_LEVEL         | Logging Level                 | DEBUG                               |
 
 ## Endpoints
 | Endpoint           | Beschreibung                                                |
@@ -27,7 +27,7 @@ Das Skript `check.py` ruft Daten aus einer Datenbank ab und vergleicht diese mit
 | /filter/"term"     | RSS Feed Titel nach "term" gefiltert                        |
 | /log               | Inhalt der Log Datei                                        |
 
-## replace.txt
+## Titel ersetzten
 Falls gewisse Titel aus der Datenbank ersetzt werden sollen, kann der Ordner `config` als Volume gemountet werden. Es wird automatisch eine Datei `replace.txt` erstellt. Pro Zeile darf nur ein Titel und der ersatz Titel getrennt durch `|` vorhanden sein.
 
 Beispiel:
@@ -36,6 +36,9 @@ Beispiel:
 Blafoo - bald auch 42|Blafoo
 Das ende der Welt - kommt bestimmt|Das ende der Welt
 ```
+
+## Debug und Loglevel
+Falls die Umgebungsvariable `LOG_LEVEL` auf `DEBUG` gestezt wird, wird Flask im Debug Modus gestartet und das Loglevel wird auf `DEBUG` gestezt. Wenn die Umgebungsvariable nicht gesetzt wird oder ein anderer Wert als `DEBUG` verwendet wird, dann ist das Loglevel `INFO` und der Flask debuger ist deaktiviert. 
 
 ## podman (Fedora)
 

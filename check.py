@@ -22,10 +22,10 @@ log_path = "./debug.log"
 
 if debug_level_str.lower() == "debug":
     debug_level = logging.DEBUG
-    flask_debug = "True"
+    flask_debug = True
 else:
     debug_level = logging.INFO
-    flask_debug = "False"
+    flask_debug = False
 
 def setLogLevel(level):
     logging.basicConfig(
