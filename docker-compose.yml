@@ -19,6 +19,6 @@ services:
       - MAX_ITEMS=200
       - RSS_URL=****
       - TZ=Europe/Zurich
-      - DEBUG_LEVEL=Info
+      - LOG_LEVEL=Info
     ports: 
         - 28080:5000

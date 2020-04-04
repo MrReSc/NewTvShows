@@ -17,24 +17,27 @@ from logging.handlers import RotatingFileHandler
 app = Flask(__name__)
 
 # Debug Level
-debug_level_str = os.environ["DEBUG_LEVEL"]
-debug_level = logging.INFO
-flask_debug = "False"
+debug_level_str = os.environ["LOG_LEVEL"]
 log_path = "./debug.log"
 
 if debug_level_str.lower() == "debug":
     debug_level = logging.DEBUG
     flask_debug = "True"
+else:
+    debug_level = logging.INFO
+    flask_debug = "False"
 
-logging.basicConfig(
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    level=debug_level,
-    handlers=[
-        logging.StreamHandler(),
-        RotatingFileHandler(log_path, maxBytes=1000, backupCount=0),
-    ]
-)
+def setLogLevel(level):
+    logging.basicConfig(
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        level=level,
+        handlers=[
+            logging.StreamHandler(),
+            RotatingFileHandler(log_path, maxBytes=1000, backupCount=0),
+        ]
+    )
 
+setLogLevel(debug_level)
 app.logger.info("Skript gestartet.")
 
 # Interval Zeit in Minuten
@@ -340,6 +343,7 @@ def filter(name):
 def log():
     content = ""
     content_list = []
+    # Log File einlesen
     with open(log_path, "r") as f:
         lines = f.readlines()
         # Log File inhalt rückwärts einlesen
@@ -347,7 +351,7 @@ def log():
             content_list.append(line)
 
         # Liste zu String
-        content = "".join(content_list[1:])
+        content = "".join(content_list[0:])
 
     return render_template('log.html', log=content)    
 
