@@ -30,9 +30,8 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     level=debug_level,
     handlers=[
-        # logging.FileHandler(log_path),
         logging.StreamHandler(),
-        RotatingFileHandler(log_path, maxBytes=100000, backupCount=0),
+        RotatingFileHandler(log_path, maxBytes=1000, backupCount=0),
     ]
 )
 
@@ -114,7 +113,7 @@ class ItemTableRSS(Table):
     Vorhanden = Col('Letzte vorhandene Episode')
 
 def check_job():  
-    print("Prüfung wird ausgeführt.")
+    app.logger.info("Prüfung wird ausgeführt.")
     mydb = mysql.connector.connect(** config)
     mycursor = mydb.cursor()
     mycursor.execute(sqlqueryName)
@@ -343,9 +342,10 @@ def log():
     content_list = []
     with open(log_path, "r") as f:
         lines = f.readlines()
-        # Log File inhalt rückwerts einlesen
+        # Log File inhalt rückwärts einlesen
         for line in reversed(lines):
             content_list.append(line)
+
         # Liste zu String
         content = "".join(content_list[1:])
 
