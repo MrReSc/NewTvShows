@@ -12,6 +12,7 @@ from flask_nav.elements import *
 from datetime import datetime
 import logging
 from logging.handlers import RotatingFileHandler
+import unicodedata
 
 # Start Flask
 app = Flask(__name__)
@@ -157,6 +158,11 @@ def check_job():
         if check:
             # Überprüfen ob eine Show aus der DB im externen Feed vorhanden ist    
             for show in shows:
+                # Überprüfen ob Show Titel nur aus einem Wort besteht
+                # wenn ja, dann wir noch ein Space am ende des Wortes hizugefügt (z.B. Mom --> findet sonst auch Momente)
+                if len(show.split()) == 1:
+                    show = show + " "
+
                 if show in t:
                     # Wenn Show vorhadnen ist dann SubElement erstellen
                     item = ET.SubElement(channel, "item")
@@ -206,12 +212,13 @@ def cleanName(name):
         for x, y in d.items():
             name = name.replace(x, y)
 
-    name = re.sub(r'\(.*\)', '', name)                                      # löscht alles in Klammern und Klammern (Blafoo2017)
-    name = name.replace("-", " ").replace("–", " ")                         # Bindestriche durch Leerzeichen ersetzten
-    name = name.replace("ä", "ae").replace("ü", "ue").replace("ö", "oe")    # äöü ersetzten
-    name = re.sub(r'[^A-Za-z0-9 ]+', '', name)                              # löscht alles was nicht Buchstabe, Leerzeichen oder Zahl ist  
-    name = re.sub(r' +', ' ', name)                                         # löscht unnötige Leerzeichen
-    name = name.lower()                                                     # alles lower case
+    name = re.sub(r'\(.*\)', '', name)                                                          # löscht alles in Klammern und Klammern (Blafoo2017)
+    name = name.replace("-", " ").replace("–", " ")                                             # Bindestriche durch Leerzeichen ersetzten
+    name = name.replace("ä", "ae").replace("ü", "ue").replace("ö", "oe")                        # äöü ersetzten
+    name = str(unicodedata.normalize('NFD', name).encode('ascii', 'ignore').decode("utf-8"))    # Akzente entfernen
+    name = re.sub(r'[^A-Za-z0-9 ]+', '', name)                                                  # löscht alles was nicht Buchstabe, Leerzeichen oder Zahl ist  
+    name = re.sub(r' +', ' ', name)                                                             # löscht unnötige Leerzeichen
+    name = name.lower()                                                                         # alles lower case
     app.logger.debug(name)
     return name
 
