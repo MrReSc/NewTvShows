@@ -62,6 +62,11 @@ if not os.path.exists("./config/replace.txt"):
     os.system("mkdir ./config")
     os.system("touch ./config/replace.txt")
 
+# exclude.txt in config erstellen wenn nicht vorhanden
+if not os.path.exists("./config/exclude.txt"):
+    os.system("mkdir ./config")
+    os.system("touch ./config/exclude.txt")
+
 # DB Config
 config = {
   "host" : os.environ["DB_HOST"],
@@ -142,6 +147,12 @@ def check_job():
     url_e = feedUrl
     feed_e = feedparser.parse(url_e)
 
+    # exclude Liste laden
+    path = "./config/exclude.txt"
+    exclude = []
+    with open(path) as f:
+        exclude = [line.rstrip() for line in f]
+
     # Überprufen ob neue Epdisoden vorhanden sind
     for i in feed["items"]:
         t = str(i["title"]).replace(".", " ").lower()
@@ -151,6 +162,17 @@ def check_job():
         for item_e in feed_e["items"]:
             t_e = str(item_e["title"]).replace(".", " ").lower()
             if t_e in t:
+                check = False
+                break
+
+        # Überprüfen ob ein Titel von der exclude Liste in externem RSS Feed vorhanden ist
+        for line in exclude:
+            # Überprüfen ob Show Titel nur aus einem Wort besteht
+            # wenn ja, dann wir noch ein Space am ende des Wortes hizugefügt (z.B. Mom --> findet sonst auch Momente)
+            if len(line.split()) == 1:
+                line = line + " "
+
+            if line.lower() in t:
                 check = False
                 break
 
