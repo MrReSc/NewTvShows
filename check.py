@@ -165,7 +165,7 @@ def check_job():
                 check = False
                 break
 
-        # Überprüfen ob ein Titel von der exclude Liste in externem RSS Feed vorhanden ist
+        # Überprüfen ob ein Titel von der exclude Liste in externen RSS Feed vorhanden ist
         for line in exclude:
             # Überprüfen ob Show Titel nur aus einem Wort besteht
             # wenn ja, dann wir noch ein Space am ende des Wortes hizugefügt (z.B. Mom --> findet sonst auch Momente)
@@ -180,12 +180,29 @@ def check_job():
         if check:
             # Überprüfen ob eine Show aus der DB im externen Feed vorhanden ist    
             for show in shows:
-                # Überprüfen ob Show Titel nur aus einem Wort besteht
-                # wenn ja, dann wir noch ein Space am ende des Wortes hizugefügt (z.B. Mom --> findet sonst auch Momente)
-                if len(show.split()) == 1:
-                    show = show + " "
 
-                if show in t:
+                addShow = True
+                showLen = len(show.split())
+                # Überprüfen ob Show Titel im Feed Titel vorhanden ist und der Show Titel nur aus einem Wort besteht 
+                if show in t and showLen == 1:  
+                    addShow = False  
+                    # Startindex des Titel im Feed suchen
+                    index = t.find(show)
+                    app.logger.debug(index)
+                    app.logger.debug(show)
+                    app.logger.debug(t)
+                    try:
+                        # Feed Titel beginnt mit dem Show Titel und hat am Ende ein Space
+                        if index == 0 and t[index + len(show)] == " ":
+                            addShow = True
+                        # Feed Titel enthält Show Titel aber nicht am Anfang. Wenn aber der Shwo Titel zwischen zwei Spaces steht, dann ist ok
+                        if index > 0 and t[index - 1] == " " and t[index + len(show)] == " ":
+                            addShow = True
+                    except:
+                        addShow = True
+                        pass
+                                       
+                if show in t and (addShow or showLen > 1):
                     # Wenn Show vorhadnen ist dann SubElement erstellen
                     item = ET.SubElement(channel, "item")
                     title = ET.SubElement(item, "title")
