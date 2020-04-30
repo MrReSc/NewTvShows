@@ -67,6 +67,11 @@ if not os.path.exists("./config/exclude.txt"):
     os.system("mkdir ./config")
     os.system("touch ./config/exclude.txt")
 
+# monitor.txt in config erstellen wenn nicht vorhanden
+if not os.path.exists("./config/monitor.txt"):
+    os.system("mkdir ./config")
+    os.system("touch ./config/monitor.txt")
+
 # DB Config
 config = {
   "host" : os.environ["DB_HOST"],
@@ -152,6 +157,15 @@ def check_job():
     exclude = []
     with open(path) as f:
         exclude = [line.rstrip() for line in f]
+
+    # monitor Liste laden und zur Show Liste hinzufügen wenn noch nicht vorhanden
+    path = "./config/monitor.txt"
+    with open(path) as f:
+        monitor = [line.rstrip() for line in f]
+        for m in monitor:
+            m = cleanName(m)
+            if m not in shows:
+                shows.append(m)  
 
     # Überprufen ob neue Epdisoden vorhanden sind
     for i in feed["items"]:

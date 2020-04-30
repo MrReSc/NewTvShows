@@ -37,7 +37,7 @@ Blafoo - bald auch 42|Blafoo
 Das ende der Welt - kommt bestimmt|Das ende der Welt
 ```
 ## Titel ausschliessen
-Um gewisse Titel von der Prüfung auszuschliessen, kann in der Datei `./config/exclude.txt` pro Zeile ein Titel eingetragen werden. Wenn der Ordner `config` als Volume gemountet ist, wird die Datei automatisch erstellt. 
+Um gewisse Titel von der Prüfung auszuschliessen, kann in der Datei `./config/exclude.txt` pro Zeile ein Titel eingetragen werden. Wenn der Ordner `config` als Volume gemountet ist, wird die Datei automatisch erstellt.
 Diese Titel werden bei der Feed überprüfung ignoriert. So können false-positives ausgeschlossen werden oder einfach nur Titel die nicht erwünscht sind deaktiviert werden. Wenn eine Titel `Blafoo` lauten würde, dann würden die folgenden Beispiele auch einen Treffer auslösen wenn sie nicht explizit ausgeschlossen werden.
 
 Beispiel:
@@ -46,6 +46,8 @@ Beispiel:
 Blafoo4223
 Blafoo kommt selten allein
 ```
+## Titel überwachen
+Um einen Titel im RSS Feed zu überwachen der nicht in der Datenbank vorhanden ist, kann in der Datei `./config/monitor.txt` pro Zeile ein Titel eingetragen werden. Wenn der Ordner `config` als Volume gemountet ist, wird die Datei automatisch erstellt.
 
 ## Debug und Loglevel
 Falls die Umgebungsvariable `LOG_LEVEL` auf `DEBUG` gestezt wird, wird Flask im Debug Modus gestartet und das Loglevel wird auf `DEBUG` gestezt. Wenn die Umgebungsvariable nicht gesetzt wird oder ein anderer Wert als `DEBUG` verwendet wird, dann ist das Loglevel `INFO` und der Flask debuger ist deaktiviert. 
