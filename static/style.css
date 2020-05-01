@@ -1,5 +1,5 @@
 :root {
-  --main-bg-color: #2D2D2D;
+  --main-bg-color: #292929;
   --bg-color: #1E1E1E;
   --hover-bg-color: #111111;
   --main-color: #3465A4;
@@ -16,6 +16,10 @@ body {
   background-color: var(--main-bg-color);
   color: var(--text-color);
   margin: 25px 75px;
+}
+
+* {
+  scrollbar-color: var(--hover-bg-color) var(--bg-color);
 }
 
 tbody tr td a,
@@ -40,8 +44,24 @@ tbody tr td a:visited {
   align-items: baseline;
 }
 
-input {
+.searchbox,
+.button {
   height: 40px;
+}
+
+.settingsbox { 
+  height: 180px;
+  width: 100%;
+  padding: 10;
+  margin-bottom: 10;
+  font-family: monospace;
+  font-size: large;
+}
+
+.searchbox,
+.button,
+.settingsbox {
+  padding-left: 10px;
   box-sizing: border-box;
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -53,10 +73,6 @@ select,
 textarea, 
 button { 
   font-family:inherit;
-}
-
-.searchbox {
-  padding-left: 10px;
 }
 
 .button:hover {

@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <link rel="stylesheet" href='/static/style.css'>
+    </head>
+    <body>
+        {{nav.top.render()}}
+
+        <header>
+            <h2> {{header}} </h2>
+        </header>
+
+        <form action = "/settings" method = "post" >
+            <h4>{{headerReplace}}</h4>
+            <textarea name = "replace" class = "settingsbox" placeholder="Titel1 Blafoo|Titel1">{{contentReplace}}</textarea>
+            <input type = "submit" class = "button" name = "saveReplace" value = "Speichern" />
+
+            <h4>{{headerExclude}}</h4>
+            <textarea name = "exclude" class = "settingsbox" placeholder="Titel1 Blafoo">{{contentExclude}}</textarea>
+            <input type = "submit" class = "button" name = "saveExclude" value = "Speichern" />
+
+            <h4>{{headerMonitor}}</h4>
+            <textarea name = "monitor" class = "settingsbox" placeholder="Titel1 Blafoo">{{contentMonitor}}</textarea>
+            <input type = "submit" class = "button" name = "saveMonitor" value = "Speichern" />
+        </form>
+
+    </body>
+</html>

@@ -26,6 +26,7 @@ Das Skript `check.py` ruft Daten aus einer Datenbank ab und vergleicht diese mit
 | /rss/update        | RSS Feed aktualisieren. Öffnet `/rss` nach update.          |
 | /filter/"term"     | RSS Feed Titel nach "term" gefiltert                        |
 | /log               | Inhalt der Log Datei                                        |
+| /settings          | Anzeigen und anpassen der Datein in `/config`               |
 
 ## Titel ersetzten
 Falls gewisse Titel aus der Datenbank ersetzt werden sollen, kann der Ordner `config` als Volume gemountet werden. Es wird automatisch eine Datei `replace.txt` erstellt. Pro Zeile darf nur ein Titel und der ersatz Titel getrennt durch `|` vorhanden sein.

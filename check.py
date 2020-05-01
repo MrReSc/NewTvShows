@@ -58,19 +58,22 @@ if not os.path.exists("./out/serien.xml"):
     os.system("cp ./serien.xml ./out/serien.xml")
 
 # replace.txt in config erstellen wenn nicht vorhanden
-if not os.path.exists("./config/replace.txt"):
+replace_path = "./config/replace.txt"
+if not os.path.exists(replace_path):
     os.system("mkdir ./config")
-    os.system("touch ./config/replace.txt")
+    os.system("touch " + replace_path)
 
 # exclude.txt in config erstellen wenn nicht vorhanden
-if not os.path.exists("./config/exclude.txt"):
+exclude_path = "./config/exclude.txt"
+if not os.path.exists(exclude_path):
     os.system("mkdir ./config")
-    os.system("touch ./config/exclude.txt")
+    os.system("touch " + exclude_path)
 
 # monitor.txt in config erstellen wenn nicht vorhanden
-if not os.path.exists("./config/monitor.txt"):
+monitor_path = "./config/monitor.txt"
+if not os.path.exists(monitor_path):
     os.system("mkdir ./config")
-    os.system("touch ./config/monitor.txt")
+    os.system("touch " + monitor_path)
 
 # DB Config
 config = {
@@ -153,14 +156,12 @@ def check_job():
     feed_e = feedparser.parse(url_e)
 
     # exclude Liste laden
-    path = "./config/exclude.txt"
     exclude = []
-    with open(path) as f:
+    with open(exclude_path) as f:
         exclude = [line.rstrip() for line in f]
 
     # monitor Liste laden und zur Show Liste hinzufügen wenn noch nicht vorhanden
-    path = "./config/monitor.txt"
-    with open(path) as f:
+    with open(monitor_path) as f:
         monitor = [line.rstrip() for line in f]
         for m in monitor:
             m = cleanName(m)
@@ -257,7 +258,7 @@ def check_job():
 def cleanName(name):   
     # Wenn ein File vorhanden ist und nicht leer dann werden die Begiffe ersetzt
     d = {}
-    path = "./config/replace.txt"
+    path = replace_path
     if os.path.exists(path) and os.path.getsize(path) > 0:
         with open(path) as f:
             d = dict([line.split("|") for line in f])
@@ -343,6 +344,7 @@ nav.register_element('top', Navbar(
     View('RSS Feed', 'rss'),
     View('Aktuelle Episoden', 'current'),
     View('Alle Shows', 'all'),
+    View('Einstellungen', 'settings'),
     View('Log', 'log'),
 ))
 
@@ -414,6 +416,41 @@ def log():
         content = "".join(content_list[0:])
 
     return render_template('log.html', log=content)    
+
+@app.route("/settings", methods = ['POST', 'GET'])
+def settings():
+    if request.method == 'POST':
+        # replace.txt speichern
+        if request.form.get('saveReplace', None) == "Speichern":
+            with open(replace_path, "w") as f:
+                f.write(str(request.form["replace"]))
+
+        # exclude.txt speichern
+        if request.form.get('saveExclude', None) == "Speichern":
+            with open(exclude_path, "w") as f:
+                f.write(str(request.form["exclude"]))
+
+        # monitor.txt speichern
+        if request.form.get('saveMonitor', None) == "Speichern":
+            with open(monitor_path, "w") as f:
+                f.write(str(request.form["monitor"]))
+        
+        return redirect('/settings')
+
+    else:
+        with open(replace_path, "r") as f:
+            contentReplace = f.read()
+        
+        with open(exclude_path, "r") as f:
+            contentExclude = f.read()
+
+        with open(monitor_path, "r") as f:
+            contentMonitor = f.read()    
+
+        return render_template("settings.html", header="Einstellungen",
+                                headerReplace="Titel ersetzten (/config/replace.txt)", contentReplace=contentReplace,
+                                headerExclude="Titel ausschliessen (/config/exclude.txt)", contentExclude=contentExclude,
+                                headerMonitor="Titel überwachen (/config/monitor.txt)", contentMonitor=contentMonitor)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=flask_debug)
